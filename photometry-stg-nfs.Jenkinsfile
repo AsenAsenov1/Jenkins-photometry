@@ -16,13 +16,15 @@ pipeline {
             }
             steps {
                 container('shell') {
-                    //sh "sleep 600"
                     sh """
                         pwd
                         cd ${env.images_dir}
                         pwd
                         ls *.fits > list && split -n 2 list agent_ && rm list
-                       """
+                        
+                        // Run Prepare function
+                        pp_prepare *.fits
+                    """
                 }
             }
         }
@@ -41,9 +43,11 @@ pipeline {
                     steps {
                         container('shell') {
                             sh """
-                                 cd ${env.images_dir}
-                                 cat agent_aa
-                               """
+                                cd ${env.images_dir}
+                                
+                                // Run Register function for Agent-1
+                                cat agent_aa | xargs pp_register
+                            """
                         }
                     }
                 }
@@ -59,64 +63,51 @@ pipeline {
                     steps {
                         container('shell') {
                             sh """
-                               cd ${env.images_dir}
-                               cat agent_ab
-                               """
+                                cd ${env.images_dir}
+                                // Run Register function for Agent-2
+                                cat agent_ab | xargs pp_register
+                            """
                         }
                     }
                 }
             }
         }
 
+        // Continue using the same agent
+
         stage('Photometry') {
-            agent {
-                kubernetes {
-                    label 'photometry-agent-nfs'
-                    defaultContainer 'shell'
-                    retries 2
-                }
-            }
             steps {
                 container('shell') {
                     sh """
-                       cd ${env.images_dir}
-                       exit 1
-                       """
+                        cd ${env.images_dir}
+
+                        // Run Photometry function
+                        pp_photometry *.fits
+                    """
                 }
             }
         }
 
         stage('Calibrate') {
-            agent {
-                kubernetes {
-                    label 'photometry-agent-nfs'
-                    defaultContainer 'shell'
-                    retries 2
-                }
-            }
             steps {
                 container('shell') {
                     sh """
-                       cd ${env.images_dir}
-                       ls -l *.fits
-                       """
+                        cd ${env.images_dir}
+                        // Run Calibrate function
+                        pp_calibrate *.fits
+                    """
                 }
             }
         }
 
         stage('Distill') {
-            agent {
-                kubernetes {
-                    label 'photometry-agent-nfs'
-                    defaultContainer 'shell'
-                    retries 2
-                }
-            }
             steps {
                 container('shell') {
                     sh """
-                    ls -l *.fits
-                       """
+                        cd ${env.images_dir}
+                        // Run Distill function
+                        pp_distill *.fits
+                    """
                 }
             }
         }
