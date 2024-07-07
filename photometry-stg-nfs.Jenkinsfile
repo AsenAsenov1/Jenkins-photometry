@@ -21,8 +21,8 @@ pipeline {
                         cd ${env.images_dir}
                         pwd
                         ls *.fits > list && split -n 2 list agent_ && rm list
-                        
-                        // Run Prepare function
+
+                        # Run Prepare function
                         pp_prepare *.fits
                     """
                 }
@@ -44,8 +44,8 @@ pipeline {
                         container('shell') {
                             sh """
                                 cd ${env.images_dir}
-                                
-                                // Run Register function for Agent-1
+
+                                # Run Register function for Agent-1
                                 cat agent_aa | xargs pp_register
                             """
                         }
@@ -64,7 +64,8 @@ pipeline {
                         container('shell') {
                             sh """
                                 cd ${env.images_dir}
-                                // Run Register function for Agent-2
+
+                                # Run Register function for Agent-2
                                 cat agent_ab | xargs pp_register
                             """
                         }
@@ -81,7 +82,7 @@ pipeline {
                     sh """
                         cd ${env.images_dir}
 
-                        // Run Photometry function
+                        # Run Photometry function
                         pp_photometry *.fits
                     """
                 }
@@ -93,7 +94,8 @@ pipeline {
                 container('shell') {
                     sh """
                         cd ${env.images_dir}
-                        // Run Calibrate function
+
+                        # Run Calibrate function
                         pp_calibrate *.fits
                     """
                 }
@@ -105,7 +107,8 @@ pipeline {
                 container('shell') {
                     sh """
                         cd ${env.images_dir}
-                        // Run Distill function
+
+                        # Run Distill function
                         pp_distill *.fits
                     """
                 }
