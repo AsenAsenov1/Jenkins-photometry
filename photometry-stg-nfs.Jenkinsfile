@@ -2,7 +2,7 @@ pipeline {
     agent none  // No default agent for the whole pipeline
 
     environment {
-        images_dir = 'pipeline-images'
+        images_dir = '/pvc-volume/pipeline-images'
     }
 
     stages {
