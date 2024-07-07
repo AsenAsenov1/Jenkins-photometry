@@ -20,7 +20,17 @@ pipeline {
                         pwd
                         cd ${env.images_dir}
                         pwd
-                        ls *.fits > list && split -n 2 list agent_ && rm list
+                        ls *.fits > list
+
+                        # Count the number of lines in 'list'
+                        total_files=$(wc -l < list)
+
+                        # Calculate half of the total number of files (rounded up)
+                        half=$(( (total_files + 1) / 2 ))
+
+                        # Use split to divide the list into two parts based on the number of lines
+                        split -l ${half} list agent_
+                        rm list
 
                         # Run Prepare function
                         pp_prepare *.fits
@@ -94,7 +104,7 @@ pipeline {
                 container('shell') {
                     sh """
                         cd ${env.images_dir}
-
+                        rm list
                         # Run Calibrate function
                         pp_calibrate *.fits
                     """
