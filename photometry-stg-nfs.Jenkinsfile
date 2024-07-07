@@ -2,7 +2,7 @@ pipeline {
     agent none  // No default agent for the whole pipeline
 
     environment {
-        images_dir = '/pvc-volume/pipeline-images'
+        images_dir = 'pipeline-images'
     }
 
     stages {
@@ -18,6 +18,8 @@ pipeline {
                 container('shell') {
                     //sh "sleep 600"
                     sh """
+                        pwd
+                        cd ${env.images_dir}
                         pwd
                         ls *.fits > list && split -n 2 list agent_ && rm list
                        """
@@ -39,7 +41,8 @@ pipeline {
                     steps {
                         container('shell') {
                             sh """
-                               cat agent_aa
+                                 cd ${env.images_dir}
+                                 cat agent_aa
                                """
                         }
                     }
@@ -56,6 +59,7 @@ pipeline {
                     steps {
                         container('shell') {
                             sh """
+                               cd ${env.images_dir}
                                cat agent_ab
                                """
                         }
@@ -75,8 +79,9 @@ pipeline {
             steps {
                 container('shell') {
                     sh """
-                    exit 1
-                    """
+                       cd ${env.images_dir}
+                       exit 1
+                       """
                 }
             }
         }
@@ -92,8 +97,9 @@ pipeline {
             steps {
                 container('shell') {
                     sh """
-                    ls -l *.fits
-                    """
+                       cd ${env.images_dir}
+                       ls -l *.fits
+                       """
                 }
             }
         }
@@ -110,7 +116,7 @@ pipeline {
                 container('shell') {
                     sh """
                     ls -l *.fits
-                    """
+                       """
                 }
             }
         }
